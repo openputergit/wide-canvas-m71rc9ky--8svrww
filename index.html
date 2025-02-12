@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neubrutalism Todo List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #F0F0F0;
+        }
+        .neu-brutal {
+            border: 4px solid #000;
+            box-shadow: 6px 6px 0 #000;
+            transition: all 0.2s ease;
+        }
+        .neu-brutal:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 #000;
+        }
+        .neu-brutal:active {
+            transform: translate(0, 0);
+            box-shadow: 4px 4px 0 #000;
+        }
+        .todo-item {
+            transition: all 0.3s ease;
+        }
+        .todo-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-[#5BA7C7] p-8 neu-brutal mb-8">
+            <h1 class="text-4xl font-bold mb-6">📝 Brutal Todo List</h1>
+            <div class="flex gap-4 mb-8">
+                <input type="text" id="todoInput" placeholder="Add a new task..." 
+                    class="flex-1 p-4 text-lg neu-brutal bg-white">
+                <button onclick="addTodo()" 
+                    class="px-8 py-4 bg-[#FFD23F] neu-brutal font-bold hover:bg-[#FFE169]">
+                    Add Task
+                </button>
+            </div>
+            <div id="todoList" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <script>
+        let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+        function saveTodos() {
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+
+        function renderTodos() {
+            const todoList = document.getElementById('todoList');
+            todoList.innerHTML = '';
+            
+            todos.forEach((todo, index) => {
+                const todoElement = document.createElement('div');
+                todoElement.className = `todo-item flex items-center gap-4 p-4 bg-white neu-brutal ${todo.completed ? 'completed' : ''}`;
+                
+                todoElement.innerHTML = `
+                    <input type="checkbox" 
+                        class="w-6 h-6 neu-brutal" 
+                        ${todo.completed ? 'checked' : ''}
+                        onchange="toggleTodo(${index})">
+                    <span class="flex-1 text-lg">${todo.text}</span>
+                    <button onclick="deleteTodo(${index})" 
+                        class="p-2 bg-[#FF6B6B] neu-brutal">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+                
+                todoList.appendChild(todoElement);
+            });
+        }
+
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                todos.push({
+                    text,
+                    completed: false
+                });
+                input.value = '';
+                saveTodos();
+                renderTodos();
+            }
+        }
+
+        function toggleTodo(index) {
+            todos[index].completed = !todos[index].completed;
+            saveTodos();
+            renderTodos();
+        }
+
+        function deleteTodo(index) {
+            todos.splice(index, 1);
+            saveTodos();
+            renderTodos();
+        }
+
+        // Handle Enter key
+        document.getElementById('todoInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+
+        // Initial render
+        renderTodos();
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
